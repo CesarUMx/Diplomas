@@ -27,5 +27,5 @@ yarn
 ### Ejecución
 
 ```
-yarn start
+yarn dev
 ```
