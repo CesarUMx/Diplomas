@@ -25,4 +25,7 @@ yarn
 ```
 
 ### Ejecución
+
+```
 yarn start
+```
