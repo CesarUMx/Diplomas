@@ -12,7 +12,7 @@ npm install
 ### Ejecución
 
 ```
-npm start
+node server.js
 ```
 
 ## Frontend
