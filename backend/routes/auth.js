@@ -81,21 +81,23 @@ router.get(
     "/google/callback",
     (req, res, next) => {
         passport.authenticate("google", { session: false }, (err, usuario, info) => {
+
+            const FRONTEND_URL = process.env.FRONTEND_URL;
+
             if (err) {
-                // Error en la autenticación
-                return res.status(500).json({ mensaje: "Error en la autenticación.", error: err });
+                return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent("Error en la autenticación.")}`);
             }
 
             if (!usuario) {
                 console.log(info);
                 // Usuario no aprobado o no autenticado
-                return res.status(403).json({
-                    mensaje: info?.mensaje || "No se pudo completar la autenticación.",
-                });
+                return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent(info?.mensaje || "No se pudo completar la autenticación.")}`);
             }
 
             // Usuario aprobado
             res.json({ mensaje: "Login exitoso", token: usuario.token });
+             // Usuario aprobado, redirigir a dashboard
+            //res.redirect(`/dashboard?token=${usuario.token}`);
         })(req, res, next);
     }
 );
