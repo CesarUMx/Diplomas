@@ -26,6 +26,8 @@ passport.use(
                     [profile.id, profile.emails[0].value]
                 );
 
+                let usuario = null;
+
                 if (rows.length === 0) {
                     // Si no existe, crear usuario desactivado
                     await db.query(
@@ -43,7 +45,7 @@ passport.use(
                     return done(null, false, { mensaje: "Usuario creado, pero no aprobado" });
                 }
 
-                const usuario = rows[0];
+                usuario = rows[0];
 
                 // Verificar si el usuario está aprobado
                 if (!usuario.activo) {
@@ -54,14 +56,19 @@ passport.use(
                 const token = jwt.sign(
                     {
                         id: usuario.id,
+                        nombre: usuario.nombre,
+                        avatar: usuario.avatar,
                         rol: usuario.rol_id,
                     },
                     process.env.JWT_SECRET,
                     { expiresIn: "1h" }
                 );
 
-                return done(null, { ...usuario, token });
+                usuario.token = token;
+
+                return done(null, { ...usuario, token }); 
             } catch (err) {
+                console.error("Error en la autenticación con Google:", err);
                 return done(err, false);
             }
         }
@@ -88,19 +95,57 @@ router.get(
                 return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent("Error en la autenticación.")}`);
             }
 
-            if (!usuario) {
+            if (!usuario || typeof usuario !== "object") {
                 console.log(info);
                 // Usuario no aprobado o no autenticado
                 return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent(info?.mensaje || "No se pudo completar la autenticación.")}`);
             }
 
-            // Usuario aprobado
-            res.json({ mensaje: "Login exitoso", token: usuario.token });
+            // Verificar que el usuario tenga un token
+            if (!usuario.token) {
+                console.error("Error: Usuario autenticado pero sin token", usuario);
+                return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent("Error generando el token.")}`);
+            }
+
+             // Configurar la cookie segura
+             res.cookie("token", usuario.token, {
+                httpOnly: true, // Protege la cookie del acceso desde JS
+                secure: true, // Solo en HTTPS en producción
+                sameSite: "None", // Permitir en cross-origin
+                path: "/", // Asegura que se envía en todas las rutas
+                maxAge: 3600000, // Expira en 1 hora
+            });
+
              // Usuario aprobado, redirigir a dashboard
-            //res.redirect(`/dashboard?token=${usuario.token}`);
+            res.redirect(`${FRONTEND_URL}/dashboard`);
         })(req, res, next);
     }
 );
+
+router.get("/me", (req, res) => {
+    const token = req.cookies.token;
+
+    if (!token) {
+        return res.status(401).json({ mensaje: "No autenticado" });
+    }
+
+    try {
+        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        res.json(payload); // Enviar los datos del usuario
+    } catch (error) {
+        res.status(401).json({ mensaje: "Token inválido" });
+    }
+});
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,  // Asegura que solo se envíe en HTTPS (si estás en local, puedes ponerlo en false)
+        sameSite: "None", // Usa "None" si trabajas con dominios diferentes (frontend en localhost y backend en otro servidor)
+        path: "/", // Asegurar que la cookie se borre en todas las rutas
+    });
+    res.json({ mensaje: "Logout exitoso" });
+});
 
 
 

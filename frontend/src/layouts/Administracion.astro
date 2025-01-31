@@ -1,0 +1,20 @@
+---
+import NavDer from "../components/NavDer";
+---
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+</head>
+<body class="bg-gray-100">
+    
+    <NavDer client:load />
+
+    <!-- Contenedor principal -->
+    <main class="flex-1 mt-16 px-4 py-8 overflow-auto">
+        <slot /> <!-- Aquí se inyectará el contenido de cada página -->
+    </main>
+</body>
+</html>
