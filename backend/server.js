@@ -4,10 +4,21 @@ const usuarioRoutes = require("./routes/usuarios");
 const dotenv = require("dotenv");
 
 dotenv.config();
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
+
+// Configurar CORS para permitir solicitudes desde el frontend
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL, // Asegúrate de que FRONTEND_URL está definido en .env
+        credentials: true, // Permite enviar cookies
+    })
+);
 
 app.get("/", (req, res) => {
     res.send("Servidor funcionando correctamente.");
