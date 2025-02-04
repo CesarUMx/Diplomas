@@ -1,4 +1,4 @@
-const URL_BACKEND = "https://83cb-189-206-100-66.ngrok-free.app";
+const URL_BACKEND = "http://localhost:3000";
 
 export const getBackendURL = (path) => {
     return `${URL_BACKEND}${path}`;
