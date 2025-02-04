@@ -116,8 +116,10 @@ router.get(
                 maxAge: 3600000, // Expira en 1 hora
             });
 
-             // Usuario aprobado, redirigir a dashboard
-            res.redirect(`${FRONTEND_URL}/dashboard`);
+            setTimeout(() => {
+                // Usuario aprobado, redirigir a dashboard
+                res.redirect(`${FRONTEND_URL}/dashboard`);
+            }, 1000);
         })(req, res, next);
     }
 );
