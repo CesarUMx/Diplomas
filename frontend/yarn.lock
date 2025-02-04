@@ -65,7 +65,7 @@
   dependencies:
     prismjs "^1.29.0"
 
-"@astrojs/react@^4.2.0":
+"@astrojs/react@^4.2.6":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@astrojs/react/-/react-4.2.0.tgz#39cd3598fb0734abcfa94ef8fa4d41d120faac41"
   integrity sha512-2OccnYFK+mLuy9GpJqPM3BQGvvemnXNeww+nBVYFuiH04L7YIdfg4Gq0LT7v/BraiuADV5uTl9VhTDL/ZQPAhw==
