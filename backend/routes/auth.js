@@ -31,14 +31,13 @@ passport.use(
                 if (rows.length === 0) {
                     // Si no existe, crear usuario desactivado
                     await db.query(
-                        "INSERT INTO usuarios (nombre, correo, google_id, avatar, rol_id, activo) VALUES (?, ?, ?, ?, ?, ?)",
+                        "INSERT INTO usuarios (nombre, correo, google_id, avatar, rol_id) VALUES (?, ?, ?, ?, ?)",
                         [
                             profile.displayName,
                             profile.emails[0].value,
                             profile.id,
                             profile.photos[0].value,
                             2, // Rol por defecto: Usuario
-                            false, // Usuario no aprobado
                         ]
                     );
 
@@ -48,8 +47,12 @@ passport.use(
                 usuario = rows[0];
 
                 // Verificar si el usuario está aprobado
-                if (!usuario.activo) {
+                if (!usuario.aprobado) {
                     return done(null, false, { mensaje: "El usuario no está aprobado" });
+                }
+
+                if (!usuario.activo) {
+                    return done(null, false, { mensaje: "El usuario esta desactivado" });
                 }
 
                 // Generar token JWT con rol
@@ -118,7 +121,7 @@ router.get(
 
             setTimeout(() => {
                 // Usuario aprobado, redirigir a dashboard
-                res.redirect(`${FRONTEND_URL}/dashboard`);
+                res.redirect(`${FRONTEND_URL}`);
             }, 1000);
         })(req, res, next);
     }
