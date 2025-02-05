@@ -8,7 +8,7 @@ const router = express.Router();
 // Obtener todos los usuarios
 router.get("/", authMiddleware, async (req, res) => {
     try {
-        const usuarios = await db.query("SELECT * FROM usuarios");
+        const usuarios = await db.query(" SELECT * FROM usuarios");
         res.json(usuarios[0]);
     } catch (error) {
         res.status(500).json({ mensaje: "Error al obtener usuarios", error });
@@ -34,6 +34,18 @@ router.put("/:id/desactivar", authMiddleware, async (req, res) => {
         const { id } = req.params;
         const { desactivado } = req.body;
         await db.query("UPDATE usuarios SET activo = ? WHERE id = ?", [desactivado, id]);
+        res.json({ mensaje: "Usuario actualizado" });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al actualizar usuario", error });
+    }
+});
+
+// actualizar el rol de un usuario
+router.put("/:id/rol", authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { rol } = req.body;
+        await db.query("UPDATE usuarios SET rol_id = ? WHERE id = ?", [rol, id]);
         res.json({ mensaje: "Usuario actualizado" });
     } catch (error) {
         res.status(500).json({ mensaje: "Error al actualizar usuario", error });

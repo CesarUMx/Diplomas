@@ -25,7 +25,15 @@ const UsuariosC = () => {
     },
     { name: 'Nombre', selector: row => row.nombre,},
     { name: 'Email', selector: row => row.correo,},
-    { name: 'Rol', selector: row => row.rol_id,},
+    { name: 'Rol',
+      cell: row => ( 
+          <select value={row.rol_id} onChange={e => handleToggleRol(row.id, e.target.value)}>
+            <option value="1">Administrador </option>
+            <option value="2">Usuario </option>
+          </select>
+      ),
+      ignoreRowClick: true,
+    },
     { name: "Activo",
       cell: row => (
           <Switch
@@ -99,6 +107,24 @@ const UsuariosC = () => {
                   "Content-Type": "application/json",
               },
               body: JSON.stringify({ aprobado: !estadoActual }),
+          });
+          const data = await response.json();
+          fetchUsuarios();
+      } catch (error) {
+          console.error("Error al actualizar usuario:", error);
+      }
+  };
+
+  // actualizar el rol de un usuario
+  const handleToggleRol = async (id, rol) => {
+      try {
+          const response = await fetch(URL_USUARIOS + "/" + id + "/rol", {
+              method: "PUT",
+              credentials: "include",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ rol }),
           });
           const data = await response.json();
           fetchUsuarios();
