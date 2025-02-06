@@ -6,12 +6,12 @@ const authMiddleware = (req, res, next) => {
         return res.status(401).json({ mensaje: "Token no proporcionado" });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verificar el token
-        req.user = decoded; // Guardar los datos del usuario en la solicitud
-        next(); // Continuar al siguiente middleware
+     try {
+         const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verificar el token
+    //     req.user = decoded; // Guardar los datos del usuario en la solicitud
+         next(); // Continuar al siguiente middleware
     } catch (err) {
-        return res.status(403).json({ mensaje: "Token inválido" });
+         return res.status(403).json({ mensaje: "Token inválido" });
     }
 };
 
