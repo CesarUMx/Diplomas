@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/auth");
 const usuarioRoutes = require("./routes/usuarios");
+const plantillaRoutes = require("./routes/plantillas");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 app.use("/usuarios", usuarioRoutes);
+app.use("/plantillas", plantillaRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
