@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../config/db');
 const upload = require('../middleware/upload');
 const authMiddleware = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
 
 //subir una plantilla
 router.post("/", authMiddleware, upload.single("archivo"), async (req, res) => {
@@ -22,7 +24,7 @@ router.post("/", authMiddleware, upload.single("archivo"), async (req, res) => {
             return res.status(400).json({ mensaje: "El archivo debe ser un archivo SVG" });
         }
 
-        const archivo_svg = `/uploads/plantillas/${req.file.filename}`;
+        const archivo_svg = `${req.file.filename}`;
 
         const [result] = await db.query(
             "INSERT INTO plantillas (nombre, descripcion, archivo_svg) VALUES (?, ?, ?)",
@@ -88,7 +90,7 @@ router.put("/:id", authMiddleware, upload.single("archivo"), async (req, res) =>
 
         // Si se sube un nuevo archivo, reemplazar el anterior
         if (req.file) {
-            archivo_svg = `/uploads/plantillas/${req.file.filename}`;
+            archivo_svg = `${req.file.filename}`;
         }
 
         // Actualizar la plantilla en la base de datos
@@ -102,7 +104,6 @@ router.put("/:id", authMiddleware, upload.single("archivo"), async (req, res) =>
         res.status(500).json({ mensaje: "Error al actualizar la plantilla", Error });
     }
 });
-
 
 //eliminar de forma logica una plantilla
 router.delete("/:id", authMiddleware, async (req, res) => {
@@ -120,6 +121,18 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     } catch (error) {
         res.status(500).json({ mensaje: "Error al eliminar la plantilla", error });
     }
+});
+
+// Endpoint para acceder a archivos con autenticación
+router.get("/archivo/:nombre", authMiddleware, (req, res) => {
+    const fileName = req.params.nombre;
+    const filePath = path.join(__dirname, "../uploads/plantillas", fileName);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ mensaje: "Archivo no encontrado" });
+    }
+
+    res.sendFile(filePath);
 });
 
 module.exports = router;

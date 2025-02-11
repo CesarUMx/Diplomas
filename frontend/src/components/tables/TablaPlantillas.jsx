@@ -1,5 +1,6 @@
 import DataTable from 'react-data-table-component';
 import { Trash, Edit } from "lucide-react";
+import { getArchivoURL } from "../../utils/url";
 
 const TablaPlantillas = ({ plantillas, fetchData, onEditar, onEliminar }) => {
     const columns = [
@@ -17,11 +18,15 @@ const TablaPlantillas = ({ plantillas, fetchData, onEditar, onEliminar }) => {
       },
       {
         name: "Archivo SVG",
-        cell: (row) => (
-          <a href={row.archivo_svg} target="_blank" rel="noopener noreferrer">
-            Ver SVG
-          </a>
-        ),
+        cell: row => (
+            <div className="flex justify-center">
+              <img
+                src={getArchivoURL(row.archivo_svg.split("/").pop())} // Extrae el nombre del archivo y genera la URL
+                className="w-16 h-auto border rounded-md"
+                alt="Previsualización SVG"
+              />
+            </div>
+          ),
       },
       {
         name: "Acciones",
