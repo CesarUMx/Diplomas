@@ -143,7 +143,7 @@ const UsuariosC = () => {
   if (!permitido) return <p>No tienes permisos para acceder a esta página.</p>;
 
   return (
-    <div className="container mt-4">
+    <div className="mt-4">
       <div className="mb-3 flex items-center justify-between border-b border-gray-300 pb-1">
         <h1 className="text-2xl font-bold mb-0 flex-1 ">Gestión de Usuarios</h1>
 

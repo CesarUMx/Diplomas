@@ -25,7 +25,7 @@ const Sidebar = ({ rol }) => {
                 </h2>
                 <ul className="space-y-1">
                     <li>
-                        <a href="/plantillas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
+                        <a href="/Plantillas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
                             <NotepadTextDashed size={18} color="#ffffff" /> <span className="ml-3">Plantillas</span>
                         </a>
                     </li>

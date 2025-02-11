@@ -38,7 +38,7 @@ router.post("/", authMiddleware, upload.single("archivo"), async (req, res) => {
 //listar plantillas
 router.get("/", authMiddleware, async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM plantillas");
+        const result = await db.query("SELECT * FROM plantillas WHERE activo = 1");
 
         if (result[0].length === 0) {
             return res.status(404).json({ mensaje: "No se encontró ninguna plantilla" });
