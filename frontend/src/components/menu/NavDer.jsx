@@ -1,11 +1,10 @@
 import { LogOut } from "lucide-react";
-import avatar from "../assets/default.png";
-import React, { useState, useEffect, use } from "react";
+import avatar from "../../assets/default.png";
 import Sidebar from "./Sidebar";
-import logo from "../assets/logo.png";
-import { getBackendURL } from "../utils/url";
-import useVerificarUsuario from "../hooks/authH";
-import Loader from "./Loader";
+import logo from "../../assets/logo.png";
+import { getBackendURL } from "../../utils/url";
+import useVerificarUsuario from "../../hooks/authH";
+import Loader from "../others/Loader";
 
 const URL_BACKEND_logout = getBackendURL("/auth/logout");
 const NavDer = () => {

@@ -5,7 +5,7 @@ const URL_BACKEND_ME = getBackendURL("/auth/me");
 
 const useVerificarRol = (rolesPermitidos) => {
     const [rol, setRol] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [rolLoading, setRolLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -29,14 +29,14 @@ const useVerificarRol = (rolesPermitidos) => {
                 setRol(null);
                 window.location.href = "/Login"; // Redirigir al usuario
             } finally {
-                setLoading(false);
+                setRolLoading(false);
             }
         };
 
         fetchUser();
     }, []);
 
-    return { rol, loading, permitido: rolesPermitidos.includes(rol) };
+    return { rol, rolLoading, permitido: rolesPermitidos.includes(rol) };
 };
 
 export default useVerificarRol;
