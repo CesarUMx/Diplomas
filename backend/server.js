@@ -2,6 +2,7 @@ const express = require("express");
 const authRoutes = require("./routes/auth");
 const usuarioRoutes = require("./routes/usuarios");
 const plantillaRoutes = require("./routes/plantillas");
+const grupoRoutes = require("./routes/grupos");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/usuarios", usuarioRoutes);
 app.use("/plantillas", plantillaRoutes);
+app.use("/grupos", grupoRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
