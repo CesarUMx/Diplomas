@@ -15,9 +15,10 @@ const PlantillasC = () => {
   const [filtro, setFiltro] = useState("");
 
 
-  const plantillasFiltradas = plantillas.filter((plantilla) =>
-    plantilla.nombre.toLowerCase().includes(filtro.toLowerCase())
-  );
+  const plantillasFiltradas = Array.isArray(plantillas)
+  ? plantillas.filter((plantilla) =>
+    plantilla.nombre.toLowerCase().includes(filtro.toLowerCase()))
+  : [];
 
   const handleEliminar = async (id) => {
     AlertaEliminar({
@@ -45,6 +46,7 @@ const PlantillasC = () => {
                 placeholder="Buscar por nombre"
                 value={filtro}
                 onChange={e => setFiltro(e.target.value)}
+                disabled={!(plantillas?.length > 0)}
             />
             </div>
 
@@ -53,11 +55,15 @@ const PlantillasC = () => {
                       onClick={() => ModalPlantilla(null, fetchData)}
               >
                 <Plus size={22} color="#fff" />
-                <span className="ml-3">Nueva Plantilla</span>
+                <span className="ml-1">Nueva Plantilla</span>
               </button>
             </div>
         </div>
-      <TablaPlantillas plantillas={plantillasFiltradas} fetchData={fetchData} onEditar={ModalPlantilla} onEliminar={handleEliminar} />
+        {
+          plantillas.length ?
+          <TablaPlantillas plantillas={plantillasFiltradas} fetchData={fetchData} onEditar={ModalPlantilla} onEliminar={handleEliminar} />
+          : <p>No hay plantillas, crea una primero.</p>
+        }
     </div>
   );
 };

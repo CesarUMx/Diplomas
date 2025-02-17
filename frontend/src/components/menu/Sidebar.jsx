@@ -30,7 +30,7 @@ const Sidebar = ({ rol }) => {
                         </a>
                     </li>
                     <li>
-                        <a href="/diplomas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
+                        <a href="/Diplomas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
                             <ScrollText size={18} color="#ffffff" /> <span className="ml-3">Diplomas</span>
                         </a>
                     </li>

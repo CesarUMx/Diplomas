@@ -1,0 +1,11 @@
+---
+import Administracion from "../../layouts/Administracion.astro";
+import DiplomasC from "../../components/Diplomas";
+
+const { id } = Astro.params;
+
+---
+
+<Administracion>
+    <DiplomasC id={id} client:load/>
+</Administracion>
