@@ -3,6 +3,7 @@ const authRoutes = require("./routes/auth");
 const usuarioRoutes = require("./routes/usuarios");
 const plantillaRoutes = require("./routes/plantillas");
 const grupoRoutes = require("./routes/grupos");
+const alumnosRoutes = require("./routes/alumnos");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.use("/auth", authRoutes);
 app.use("/usuarios", usuarioRoutes);
 app.use("/plantillas", plantillaRoutes);
 app.use("/grupos", grupoRoutes);
+app.use("/alumnos", alumnosRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

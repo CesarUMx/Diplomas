@@ -1,0 +1,7 @@
+CREATE TABLE estudiantes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_grupo INT NOT NULL,
+  nombre VARCHAR(255) NOT NULL,
+  creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_grupo) REFERENCES grupos(id)
+);
