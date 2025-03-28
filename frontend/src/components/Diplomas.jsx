@@ -7,12 +7,17 @@ import { useState } from "react";
 import TablaEstudiantes from "./tables/TablaEstudiantes";
 import AlertaEliminar from "./modals/AlertaEliminar";
 import ModalAlumnos from "./modals/ModalAlumnos";
+import { getBackendURL } from "../utils/url";
+import Swal from "sweetalert2";
 
 
 const DiplomasC = ({ id }) => {
     const { rol, rolLoading, permitido } = useVerificarRol([1, 2]);
     const { data: grupo, fetchData, loading } = useFetchData("/grupos/" + id);
     const [filtro, setFiltro] = useState("");
+    const URL_GENERAR = getBackendURL(`/diplomas/${id}/generar`);
+    const URL_DESCARGAR = getBackendURL(`/diplomas/${id}/descargar`);
+    const [loder, setLoader] = useState(false);
 
     const alumnosFiltrados = Array.isArray(grupo.alumnos)
     ? grupo.alumnos.filter((alumno) =>
@@ -32,8 +37,32 @@ const DiplomasC = ({ id }) => {
         ModalAlumnos(alumno, grupo.id, fetchData);
     };
 
+    const handleGenerarTodosPDF = async () => {
+        setLoader(true);
+        try {
+          const res = await fetch(URL_GENERAR, {
+            method: "POST",
+            credentials: "include", // si usas cookies o auth
+          });
+      
+          const data = await res.json();
+      
+          if (res.ok) {
+            Swal.fire("¡Éxito!", data.mensaje, "success");
+            fetchData();
+          } else {
+            Swal.fire("Error", data.mensaje || "No se pudo generar los diplomas", "error");
+          }
+        } catch (error) {
+          console.error("Error al generar diplomas:", error);
+          Swal.fire("Error", "Error inesperado al generar los PDFs", "error");
+        } finally {
+            setLoader(false);
+        }
+      };
+
     if (!permitido) return <p>No tienes permisos para acceder a esta página.</p>;
-    if (loading || rolLoading) return (<Loader />);
+    if (loading || rolLoading || loder) return (<Loader />);
 
     return (
         <div className="mt-4">
@@ -74,10 +103,31 @@ const DiplomasC = ({ id }) => {
                 }
 
             </div> 
-
+            
             {
                 grupo.alumnos.length > 0 ?
-                    <TablaEstudiantes estudiantes={alumnosFiltrados} onEliminar={handleEliminar} onEditar={handleEditar} />
+                    <>
+                        <div className="flex justify-end mb-4">
+                        {
+                         grupo.pdfs === 0 ?
+                            <button
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                            onClick={handleGenerarTodosPDF}
+                            >
+                            Generar diplomas
+                            </button>
+                            :
+                            <a
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                            href={URL_DESCARGAR}
+                            >
+                            Descargar Diplomas
+                            </a>
+                        }
+                        </div>
+                        
+                        <TablaEstudiantes estudiantes={alumnosFiltrados} onEliminar={handleEliminar} onEditar={handleEditar} />
+                    </>
                     :
                     <p>No hay alumnos en este grupo.</p>
             }

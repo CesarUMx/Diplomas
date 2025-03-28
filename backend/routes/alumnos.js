@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../config/db');
 const authMiddleware = require('../middleware/auth');
 const { v4: uuidv4 } = require("uuid");
+const eliminarPDFsDeGrupo = require("../models/utils/limpieza");
 
 router.post("/", authMiddleware, async (req, res) => {
     try {
@@ -17,6 +18,13 @@ router.post("/", authMiddleware, async (req, res) => {
             "INSERT INTO estudiantes (nombre, id_grupo, uuid_qr) VALUES (?, ?, ?)",
             [nombre, id_grupo, uuid]
         );
+
+        const [grupo] = await db.query("SELECT * FROM grupos WHERE id = ?", [id_grupo]);
+        if (grupo[0].pdfs > 0) {
+            console.log("quitar pdfs");
+            await db.query("UPDATE grupos SET pdfs = ? WHERE id = ?", [0, id_grupo]);
+            await eliminarPDFsDeGrupo(id_grupo);
+        }
 
         res.json({ mensaje: "Alumno creado correctamente", id: result.insertId });
     } catch (error) {
@@ -39,6 +47,13 @@ router.put("/:id", authMiddleware, async (req, res) => {
             [nombre, id_grupo || null, id]
         );
 
+        const [grupo] = await db.query("SELECT * FROM grupos WHERE id = ?", [id_grupo]);
+        if (grupo[0].pdfs > 0) {
+            console.log("quitar pdfs");
+            await db.query("UPDATE grupos SET pdfs = ? WHERE id = ?", [0, id_grupo]);
+            await eliminarPDFsDeGrupo(id_grupo);
+        }
+
         res.json({ mensaje: "Alumno actualizado correctamente" });
     } catch (error) {
         console.error(error);
@@ -56,6 +71,13 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         }
 
         await db.query("UPDATE estudiantes SET activo = 0 WHERE id = ?", [id]);
+
+        const [grupo] = await db.query("SELECT * FROM grupos WHERE id = ?", [result[0].id_grupo]);
+        if (grupo[0].pdfs > 0) {
+            console.log("quitar pdfs");
+            await db.query("UPDATE grupos SET pdfs = ? WHERE id = ?", [0, grupo[0].id]);
+            await eliminarPDFsDeGrupo(grupo[0].id);
+        }
 
         res.json({ mensaje: "Alumno eliminado correctamente" });
     } catch (error) {

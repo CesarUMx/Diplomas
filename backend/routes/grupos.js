@@ -7,11 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const csv = require('csv-parser');
 const { v4: uuidv4 } = require("uuid");
-const QRCode = require("qrcode");
-
 const upload = multer({ dest: path.join(__dirname, '../uploads/csv') });
-
-const FRONTEND_URL = process.env.FRONTEND_URL;
 
 //listar grupos
 router.get("/", authMiddleware, async (req, res) => {
@@ -115,14 +111,6 @@ router.get("/:id", authMiddleware, async (req, res) => {
         // Obtener los alumnos del grupo
         const alumnosResult = await db.query("SELECT * FROM estudiantes WHERE id_grupo = ? AND activo = 1", [id]);
         const alumnos = alumnosResult[0];
-
-        // Generar el QR base64 para cada alumno
-        for (let alumno of alumnos) {
-            if (alumno.uuid_qr) {
-            const url = `${FRONTEND_URL}/validar/${alumno.uuid_qr}`;
-            alumno.qr_base64 = await QRCode.toDataURL(url, { width: 200 });
-            }
-        }
 
         // Responder con grupo + alumnos
         res.json({
