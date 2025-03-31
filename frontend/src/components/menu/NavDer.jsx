@@ -31,12 +31,12 @@ const NavDer = () => {
 
     return (
 
-    <nav className="fixed top-0 left-0 w-full shadow-md z-50 px-4 py-2 flex items-center justify-between bg-stone-800">
+    <nav className="fixed top-0 left-0 w-full shadow-md z-50 px-4 py-2 flex items-center justify-between blue_mondragon">
         <div className="flex items-center gap-3">
 
         <Sidebar rol={user?.rol} />
-        <a href="/" className="text-2xl font-bold">
-            <img src={logo.src} alt="Logo" className="h-10 w-auto" />
+        <a href="/">
+            <img src={logo.src} alt="Logo" className="h-14 w-auto" />
         </a>
 
         </div>

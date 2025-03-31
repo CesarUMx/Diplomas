@@ -6,6 +6,7 @@ const grupoRoutes = require("./routes/grupos");
 const alumnosRoutes = require("./routes/alumnos");
 const diplomasRoutes = require("./routes/diplomas");
 const dotenv = require("dotenv");
+const path = require("path");
 
 dotenv.config();
 const cors = require("cors");
@@ -15,6 +16,8 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+app.use('/uploads/empresas', express.static(path.join(__dirname, 'uploads/empresas')));
 
 // Configurar CORS para permitir solicitudes desde el frontend
 app.use(

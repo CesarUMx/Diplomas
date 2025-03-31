@@ -5,20 +5,20 @@ import AlertaEliminar from "./modals/AlertaEliminar";
 import { useState } from "react";
 import { Search, Plus } from "lucide-react";
 import ModalGrupo from "./modals/ModalGrupo";
+import { getBackendURL } from "../utils/url";
 
 const GruposDiplomasC = () => {
 
   const { rol, rolLoading, permitido } = useVerificarRol([1, 2]);
   const { data: grupos, fetchData, loading } = useFetchData("/grupos");
   const [filtro, setFiltro] = useState("");
-
-
   const gruposFiltrados = Array.isArray(grupos) 
     ? grupos.filter((grupo) =>
         grupo.nombre.toLowerCase().includes(filtro.toLowerCase())
         ) 
     : [];
 
+  const URL = getBackendURL("");
 
   const handleEliminar = async (id) => {
     AlertaEliminar({
@@ -68,7 +68,17 @@ const GruposDiplomasC = () => {
             grupos.length ? gruposFiltrados.map((grupo) => (
                 <div key={grupo.id} className="bg-white px-8 py-4 rounded-lg shadow-md text-center relative">
               <button className="flex flex-col items-center" onClick={() => verGrupo(grupo.id)}>
-                <span className="text-blue-500 text-4xl">📁</span>
+                {
+                  grupo.imagen_url ? (
+                    <img 
+                        src={`${URL}${grupo.imagen_url}`}
+                        alt={grupo.nombre}
+                        className="w-24 h-24 object-cover rounded-lg mb-2"
+                    />
+                  ) : (
+                    <span className="text-blue-500 text-8xl">📁</span>
+                  )
+                }
                 <p className="text-lg font-medium mt-2">{grupo.nombre}</p>
                 <p className="text-sm text-gray-500">{grupo.descripcion}</p>
               </button>

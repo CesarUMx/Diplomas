@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Undo2, Menu, Users, NotepadTextDashed, ScrollText } from "lucide-react";
+import "./menu.css";
 
 const Sidebar = ({ rol }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -10,33 +11,33 @@ const Sidebar = ({ rol }) => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <Menu color="#ffffff" />
+                <Menu color="#FF4D00" />
             </button>
 
             {/* Menú lateral */}
-            <div className={`fixed top-0 left-0 h-full w-64 bg-stone-800 shadow-lg transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}>
+            <div className={`fixed top-0 left-0 h-full w-64 blue_mondragon shadow-lg transform ${isOpen ? "translate-x-0" : "-translate-x-full"} transition-transform duration-300`}>
                 <h2 className="text-xl font-bold p-4 flex items-center justify-between text-white">
                     Menú
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                 >
-                    <Undo2 color="#ffffff" />
+                    <Undo2 color="#FF4D00" />
                 </button>
                 </h2>
                 <ul className="space-y-1">
                     <li>
-                        <a href="/Plantillas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
+                        <a href="/Plantillas" className="block text-white I_blue_mondragon px-4 py-2 text-center transition items-center flex justify-center">
                             <NotepadTextDashed size={18} color="#ffffff" /> <span className="ml-3">Plantillas</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/Diplomas" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">
+                        <a href="/Diplomas" className="block text-white I_blue_mondragon px-4 py-2 text-center transition items-center flex justify-center">
                             <ScrollText size={18} color="#ffffff" /> <span className="ml-3">Diplomas</span>
                         </a>
                     </li>
                     {rol === 1 && (
                         <li>
-                            <a href="/Usuarios" className="block bg-stone-800/10 text-white px-4 py-2 text-center hover:bg-stone-600 transition items-center flex justify-center">  
+                            <a href="/Usuarios" className="block text-white I_blue_mondragon px-4 py-2 text-center transition items-center flex justify-center">  
                                 <Users color="#ffffff" size={18} /> <span className="ml-3">Usuarios</span>
                             </a>
                         </li>

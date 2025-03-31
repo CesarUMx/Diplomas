@@ -9,6 +9,35 @@ const csv = require('csv-parser');
 const { v4: uuidv4 } = require("uuid");
 const upload = multer({ dest: path.join(__dirname, '../uploads/csv') });
 
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dir = path.join(__dirname, '../uploads/empresas');
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const uploadImage = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Solo se permiten imágenes (jpeg, jpg, png, gif)'));
+    }
+}).single('imagen');
+
 //listar grupos
 router.get("/", authMiddleware, async (req, res) => {
     try {
@@ -32,48 +61,73 @@ router.get("/", authMiddleware, async (req, res) => {
 
 // crear un grupo
 router.post("/", authMiddleware, async (req, res) => {
-    try {
-        const { nombre, descripcion, id_plantilla } = await req.body;
+    uploadImage(req, res, async (err) => {
+        try {
+            if (err) {
+                return res.status(400).json({ mensaje: "Error al cargar la imagen", error: err.message });
+            }
+            const { nombre, descripcion, id_plantilla, fecha } = await req.body;
+            const image = req.file ? `/uploads/empresas/${req.file.filename}` : null;
 
-        console.log(req.body);
-   
+            if (!nombre || !descripcion || !fecha) {
+                return res.status(400).json({ mensaje: "Los campos nombre, descripcion y fecha son obligatorios" });
+            }
 
-        if (!nombre || !descripcion) {
-            return res.status(400).json({ mensaje: "Los campos nombre y descripcion son obligatorios" });
+            const [result] = await db.query(
+                "INSERT INTO grupos (nombre, descripcion, id_plantilla, fecha_curso, imagen_url) VALUES (?, ?, ?, ?, ?)",
+                [nombre, descripcion, id_plantilla || null, fecha, image]
+            );
+
+            res.json({ mensaje: "Grupo creado correctamente", id: result.insertId });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ mensaje: "Error al crear el grupo", error });
         }
-
-        const [result] = await db.query(
-            "INSERT INTO grupos (nombre, descripcion, id_plantilla) VALUES (?, ?, ?)",
-            [nombre, descripcion, id_plantilla || null]
-        );
-
-        res.json({ mensaje: "Grupo creado correctamente", id: result.insertId });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ mensaje: "Error al crear el grupo", error });
-    }
+    });
 });
 
 // actualizar un grupo
 router.put("/:id", authMiddleware, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { nombre, descripcion, id_plantilla } = req.body;
+    uploadImage(req, res, async (err) => {
+        try {
 
-        if (!nombre || !descripcion) {
-            return res.status(400).json({ mensaje: "Los campos nombre y descripcion son obligatorios" });
+            if (err) {
+                return res.status(400).json({ mensaje: "Error al cargar la imagen", error: err.message });
+            }
+
+            const { id } = req.params;
+            const { nombre, descripcion, id_plantilla, fecha } = await req.body;
+
+            if (!nombre || !descripcion || !fecha) {
+                return res.status(400).json({ mensaje: "Los campos nombre, descripcion y fecha son obligatorios" });
+            }
+
+            // Get current image if exists
+            const [currentGroup] = await db.query("SELECT imagen_url FROM grupos WHERE id = ?", [id]);
+            let imagen_url = currentGroup[0]?.imagen_url;
+
+            // If new image uploaded, delete old one and update path
+            if (req.file) {
+                if (imagen_url) {
+                    const oldImagePath = path.join(__dirname, '..', imagen_url);
+                    if (fs.existsSync(oldImagePath)) {
+                        fs.unlinkSync(oldImagePath);
+                    }
+                }
+                imagen_url = `/uploads/empresas/${req.file.filename}`;
+            }
+
+            await db.query(
+                "UPDATE grupos SET nombre = ?, descripcion = ?, id_plantilla = ?, fecha_curso = ?, imagen_url = ? WHERE id = ?",
+                [nombre, descripcion, id_plantilla || null, fecha, imagen_url, id]
+            );
+
+            res.json({ mensaje: "Grupo actualizado correctamente" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ mensaje: "Error al actualizar el grupo", error });
         }
-
-        await db.query(
-            "UPDATE grupos SET nombre = ?, descripcion = ?, id_plantilla = ? WHERE id = ?",
-            [nombre, descripcion, id_plantilla || null, id]
-        );
-
-        res.json({ mensaje: "Grupo actualizado correctamente" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ mensaje: "Error al actualizar el grupo", error });
-    }
+    });
 });
 
 // eliminar un grupo
