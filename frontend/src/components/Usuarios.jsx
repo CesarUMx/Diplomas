@@ -24,8 +24,8 @@ const UsuariosC = () => {
               method: "PUT",
               credentials: "include",
               headers: {
-                  "Content-Type": "application/json",
-              },
+                'Content-Type': 'application/json'
+               },
               body: JSON.stringify({ desactivado: !estadoActual }),
           });
           fetchData();
@@ -40,8 +40,8 @@ const UsuariosC = () => {
               method: "PUT",
               credentials: "include",
               headers: {
-                  "Content-Type": "application/json",
-              },
+                'Content-Type': 'application/json'
+                },
               body: JSON.stringify({ aprobado: !estadoActual }),
           });
           fetchData();

@@ -1,15 +1,10 @@
 ---
+import Layout from '../../layouts/Layout.astro';
 
 const { uuid } = Astro.params;
 
 ---
 
-<html>
-    <head>
-        <title>Validar QR</title>
-    </head>
-    <body>
-        <h1>Validar QR</h1>
-        <p>del uuid: {uuid}</p>
-    </body>
-</html>
+<Layout>
+	<h1>Validar {uuid}</h1>
+</Layout>

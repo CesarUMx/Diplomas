@@ -14,7 +14,12 @@ const useFetchData = (endpoint) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(URL, { credentials: "include" });
+      const response = await fetch(URL, { 
+        credentials: "include", 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
       const result = await response.json();
       setData(result);
     } catch (error) {

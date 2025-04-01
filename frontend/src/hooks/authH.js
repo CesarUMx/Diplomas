@@ -14,7 +14,7 @@ const useVerificarUsuario = () => {
                     method: "GET",
                     credentials: "include", // 🔥 Necesario para enviar cookies
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json'
                     },
                 });
 

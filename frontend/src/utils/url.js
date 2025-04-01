@@ -1,5 +1,5 @@
-// const URL_BACKEND = "http://172.18.0.35:3000";
-const URL_BACKEND = "http://localhost:3000";
+const URL_BACKEND = "http://diplomas.mondragonmexico.edu.mx:3000";
+//const URL_BACKEND = "http://localhost:3000";
 
 
 export const getBackendURL = (path) => {

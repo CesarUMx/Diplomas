@@ -26,6 +26,9 @@ const AlertaEliminar = ({id, endpoint, mensaje, onSuccess}) => {
           const response = await fetch(`${URL}/${id}`, {
             method: "DELETE",
             credentials: "include",
+            headers: {
+              'Content-Type': 'application/json'
+            },
           });
   
           if (response.ok) {

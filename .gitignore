@@ -5,3 +5,7 @@
 /frontend/.vscode
 /backend/.env
 /backend/uploads
+deploy.sh
+ecosystem.config.js
+/frontend/yarn.lock
+/frontend/package.json

@@ -87,9 +87,8 @@ router.get(
 );
 
 // Ruta para manejar el callback de Google
-router.get(
-    "/google/callback",
-    (req, res, next) => {
+router.get("/google/callback",(req, res, next) => 
+    {
         passport.authenticate("google", { session: false }, (err, usuario, info) => {
 
             const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -110,25 +109,27 @@ router.get(
                 return res.redirect(`${FRONTEND_URL}/Login?error=${encodeURIComponent("Error generando el token.")}`);
             }
 
-             // Configurar la cookie segura
-             res.cookie("token", usuario.token, {
-                httpOnly: true, // Protege la cookie del acceso desde JS
-                secure: true, // Solo en HTTPS en producción
-                sameSite: "None", // Permitir en cross-origin
-                path: "/", // Asegura que se envía en todas las rutas
-                maxAge: 3600000, // Expira en 1 hora
-            });
+              // Configurar la cookie
+                res.cookie('token', usuario.token, {
+                    sameSite: 'lax',
+                    path: '/',
+                    domain: 'diplomas.mondragonmexico.edu.mx',
+                    maxAge: 24 * 60 * 60 * 1000
+                });
 
-            setTimeout(() => {
-                // Usuario aprobado, redirigir a dashboard
-                res.redirect(`${FRONTEND_URL}`);
-            }, 1000);
+                setTimeout(() => {
+                    // Usuario aprobado, redirigir a dashboard
+                    res.redirect(`${FRONTEND_URL}`);
+                }, 1000);
+             
         })(req, res, next);
     }
 );
 
 router.get("/me", (req, res) => {
-    const token = req.cookies.token;
+    // Verificar tanto la cookie como el header de autorización
+    const token = req.cookies.token
+    console.log('Token recibido:', token); // Para debugging
 
     if (!token) {
         return res.status(401).json({ mensaje: "No autenticado" });
@@ -136,8 +137,9 @@ router.get("/me", (req, res) => {
 
     try {
         const payload = jwt.verify(token, process.env.JWT_SECRET);
-        res.json(payload); // Enviar los datos del usuario
+        res.json(payload);
     } catch (error) {
+        console.error('Error al verificar token:', error);
         res.status(401).json({ mensaje: "Token inválido" });
     }
 });
@@ -145,9 +147,10 @@ router.get("/me", (req, res) => {
 router.post("/logout", (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
-        secure: true,  // Asegura que solo se envíe en HTTPS (si estás en local, puedes ponerlo en false)
-        sameSite: "None", // Usa "None" si trabajas con dominios diferentes (frontend en localhost y backend en otro servidor)
-        path: "/", // Asegurar que la cookie se borre en todas las rutas
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+        domain: 'diplomas.mondragonmexico.edu.mx',
     });
     res.json({ mensaje: "Logout exitoso" });
 });

@@ -42,7 +42,10 @@ const DiplomasC = ({ id }) => {
         try {
           const res = await fetch(URL_GENERAR, {
             method: "POST",
-            credentials: "include", // si usas cookies o auth
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            },
           });
       
           const data = await res.json();

@@ -16,6 +16,9 @@ const NavDer = () => {
             await fetch(URL_BACKEND_logout, {
                 method: "POST",
                 credentials: "include", // Para asegurarse de que se envíe la cookie
+                headers: {
+                    'Content-Type': 'application/json'
+                },
             });
     
             document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Intento manual de eliminar la cookie en frontend

@@ -13,9 +13,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 const app = express();
-
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json());
 
 app.use('/uploads/empresas', express.static(path.join(__dirname, 'uploads/empresas')));
 
@@ -24,6 +23,7 @@ app.use(
     cors({
         origin: process.env.FRONTEND_URL, // Asegúrate de que FRONTEND_URL está definido en .env
         credentials: true, // Permite enviar cookies
+        
     })
 );
 
@@ -40,5 +40,5 @@ app.use("/diplomas", diplomasRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en puerto:${PORT}`);
 });
