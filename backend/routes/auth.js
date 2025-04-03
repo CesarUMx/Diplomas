@@ -129,7 +129,6 @@ router.get("/google/callback",(req, res, next) =>
 router.get("/me", (req, res) => {
     // Verificar tanto la cookie como el header de autorización
     const token = req.cookies.token
-    console.log('Token recibido:', token); // Para debugging
 
     if (!token) {
         return res.status(401).json({ mensaje: "No autenticado" });

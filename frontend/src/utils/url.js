@@ -1,4 +1,4 @@
-const URL_BACKEND = "http://diplomas.mondragonmexico.edu.mx:3000";
+const URL_BACKEND = "https://diplomas.mondragonmexico.edu.mx/api";
 //const URL_BACKEND = "http://localhost:3000";
 
 

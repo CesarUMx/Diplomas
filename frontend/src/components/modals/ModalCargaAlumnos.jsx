@@ -36,10 +36,7 @@ const ModalCargaAlumnos = (idGrupo, fetchAlumnos) => {
       try {
         const response = await fetch(URL_CSV, {
           method: "POST",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          mode: 'cors',
+          credentials: 'include',
           body: formData,
         });
 

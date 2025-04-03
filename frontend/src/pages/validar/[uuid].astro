@@ -1,10 +1,88 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getBackendURL } from '../../utils/url';
+import LogoColo from '../../assets/LogoColor.png';
 
 const { uuid } = Astro.params;
+let studentData = null;
+let error: string | null = null;
 
+try {
+    const response = await fetch(getBackendURL(`/diplomas/validar/${uuid}`), {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
+    
+    if (!response.ok) {
+        throw new Error('Diploma no encontrado');
+    }
+    studentData = await response.json();
+} catch (e) {
+    error = e instanceof Error ? e.message : 'Error desconocido';
+}
 ---
 
 <Layout>
-	<h1>Validar {uuid}</h1>
+    <div class="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+            {error ? (
+                <div class="p-8 text-center">
+                    <h1 class="text-2xl font-bold text-red-600">Error</h1>
+                    <p class="mt-2 text-gray-600">{error}</p>
+                </div>
+            ) : (
+                <div class="p-8">
+                   <div class="flex justify-between items-center mb-8">
+                        {studentData?.grupo?.imagen_url && (
+                            <img 
+                                src={getBackendURL(studentData.grupo.imagen_url)} 
+                                alt="Logo Grupo" 
+                                class="h-20 object-contain"
+                            />
+                        )}
+                        <div class="text-center flex-grow">
+                            <h1 class="text-3xl font-bold text-gray-900">Diploma Digital</h1>
+                            <p class="mt-2 text-sm text-gray-600">Validación de autenticidad</p>
+                        </div>
+                        <img 
+                            src={LogoColo.src} 
+                            alt="Logo Institucional" 
+                            class="h-20 object-contain"
+                        />
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="border-b pb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Información del Estudiante</h2>
+                            <p class="mt-2 text-gray-600">Nombre: <span class="font-medium">{studentData?.nombre}</span></p>
+                        </div>
+                        
+                        <div class="border-b pb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Información del programa</h2>
+                            <p class="mt-2 text-gray-600">Nombre del programa: <span class="font-medium">{studentData?.grupo?.nombre}</span></p>
+                            <p class="text-gray-600">Descripción: <span class="font-medium">{studentData?.grupo?.descripcion}</span></p>
+                            <p class="text-gray-600">Fecha: <span class="font-medium">{new Date(studentData?.grupo?.fecha_curso).toLocaleDateString()}</span></p>
+                        </div>
+                        
+                        <div class="text-center pt-4">
+                            <a 
+                                href={getBackendURL(studentData?.pdf_url)} 
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Descargar Certificado
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    </div>
 </Layout>

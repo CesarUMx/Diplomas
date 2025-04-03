@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use('/uploads/empresas', express.static(path.join(__dirname, 'uploads/empresas')));
+app.use('/uploads/diplomas', express.static(path.join(__dirname, 'uploads/diplomas')));
 
 // Configurar CORS para permitir solicitudes desde el frontend
 app.use(

@@ -10,7 +10,6 @@ const URL_BACKEND_logout = getBackendURL("/auth/logout");
 const NavDer = () => {
 
     const { user, loading } = useVerificarUsuario();
-
     const handleLogout = async () => {
         try {
             await fetch(URL_BACKEND_logout, {

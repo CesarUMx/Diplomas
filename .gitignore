@@ -9,3 +9,5 @@ deploy.sh
 ecosystem.config.js
 /frontend/yarn.lock
 /frontend/package.json
+/backend/logs
+/frontend/logs

@@ -37,10 +37,41 @@ async function generarSVGPersonalizado(alumno, grupo, archivoSVG) {
       // Generar el QR base64 con uuid del alumno
       const FRONTEND_URL = process.env.FRONTEND_URL;
       const qrUrl = `${FRONTEND_URL}/validar/${alumno.uuid_qr}`;
-      const qrBase64 = await QRCode.toDataURL(qrUrl, { width: parseInt(width) });
+
+      const qrOptions = {
+        width: parseInt(width),
+        color: {
+          dark: '#004987',
+          light: '#ffffff'
+        },
+        errorCorrectionLevel: 'Q',
+        margin: 3,
+        quality: 1.0,
+      };
+
+      const qrBase64 = await QRCode.toDataURL(qrUrl, qrOptions);
+
+      const logoPath = path.resolve(__dirname, "../../uploads/empresas/logo.jpg");
+      const logoBase64 = await fs.readFile(logoPath)
+        .then(buffer => `data:image/png;base64,${buffer.toString('base64')}`)
+        .catch(err => {
+          console.error('Error loading logo:', err);
+          return null;
+        });
 
       // Insertar imagen en lugar del QR
-      const qrImg = `<image href="${qrBase64}" x="${x}" y="${y}" width="${width}" height="${height}" />`;
+      const qrImg = `
+      <g>
+        <image href="${qrBase64}" x="${x}" y="${y}" width="${width}" height="${height}" />
+        <image 
+            href="${logoBase64}"
+            x="${Number(x) + (Number(width) - Number(width)/5)/2}" 
+            y="${Number(y) + (Number(height) - Number(height)/5)/2}" 
+            width="${Number(width)/5}" 
+            height="${Number(height)/5}"
+          />
+      </g>  
+      `;
       $("svg").append(qrImg);
     }
 

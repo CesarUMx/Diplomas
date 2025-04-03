@@ -72,4 +72,47 @@ router.get("/:id/descargar", authMiddleware, async (req, res) => {
     archive.finalize();
 });
 
+router.get("/validar/:uuid", async (req, res) => {
+    const { uuid } = req.params;
+
+    try {
+        // Get student and related information
+        const [rows] = await db.query(`
+            SELECT 
+                e.nombre,
+                e.uuid_qr,
+                g.nombre as grupo_nombre,
+                g.descripcion as grupo_descripcion,
+                g.fecha_curso,
+                g.imagen_url,
+                CONCAT('/uploads/diplomas/', g.id, '/', REPLACE(e.nombre, ' ', '_'), '.pdf') as pdf_url
+            FROM estudiantes e
+            JOIN grupos g ON e.id_grupo = g.id
+            WHERE e.uuid_qr = ? AND e.activo = 1
+        `, [uuid]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ mensaje: "Diploma no encontrado" });
+        }
+
+        // Format the response
+        const diploma = {
+            nombre: rows[0].nombre,
+            pdf_url: rows[0].pdf_url,
+            grupo: {
+                nombre: rows[0].grupo_nombre,
+                descripcion: rows[0].grupo_descripcion,
+                fecha_curso: rows[0].fecha_curso,
+                imagen_url: rows[0].imagen_url
+            }
+        };
+
+        res.json(diploma);
+
+    } catch (error) {
+        console.error("Error al validar diploma:", error);
+        res.status(500).json({ mensaje: "Error interno al validar diploma" });
+    }
+});
+
 module.exports = router;
