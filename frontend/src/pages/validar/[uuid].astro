@@ -43,26 +43,26 @@ try {
                                 class="h-20 object-contain"
                             />
                         )}
-                        <div class="text-center flex-grow">
-                            <h1 class="text-3xl font-bold text-gray-900">Diploma Digital</h1>
-                            <p class="mt-2 text-sm text-gray-600">Validación de autenticidad</p>
-                        </div>
+                        
                         <img 
                             src={LogoColo.src} 
                             alt="Logo Institucional" 
                             class="h-20 object-contain"
                         />
                     </div>
-                    
+
+                    <div class="text-center flex-grow mb-4">
+                        <h1 class="text-3xl font-bold text-gray-900">Validación de autenticidad Digital</h1>
+                    </div>
                     <div class="space-y-6">
                         <div class="border-b pb-4">
-                            <h2 class="text-xl font-semibold text-gray-800">Información del Estudiante</h2>
+                            <h2 class="text-xl font-semibold text-gray-800">Información del Estudiante:</h2>
                             <p class="mt-2 text-gray-600">Nombre: <span class="font-medium">{studentData?.nombre}</span></p>
                         </div>
                         
                         <div class="border-b pb-4">
-                            <h2 class="text-xl font-semibold text-gray-800">Información del programa</h2>
-                            <p class="mt-2 text-gray-600">Nombre del programa: <span class="font-medium">{studentData?.grupo?.nombre}</span></p>
+                            <h2 class="text-xl font-semibold text-gray-800">Información del programa:</h2>
+                            <p class="mt-2 text-gray-600">Nombre: <span class="font-medium">{studentData?.grupo?.nombre}</span></p>
                             <p class="text-gray-600">Descripción: <span class="font-medium">{studentData?.grupo?.descripcion}</span></p>
                             <p class="text-gray-600">Fecha: <span class="font-medium">{new Date(studentData?.grupo?.fecha_curso).toLocaleDateString()}</span></p>
                         </div>
@@ -77,7 +77,7 @@ try {
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
-                                Descargar Certificado
+                                Descargar
                             </a>
                         </div>
                     </div>
