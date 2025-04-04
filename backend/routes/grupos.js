@@ -8,6 +8,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const { v4: uuidv4 } = require("uuid");
 const upload = multer({ dest: path.join(__dirname, '../uploads/csv') });
+const eliminarPDFsDeGrupo = require("../models/utils/limpieza");
 
 // Configure multer for image uploads
 const storage = multer.diskStorage({
@@ -66,17 +67,40 @@ router.post("/", authMiddleware, async (req, res) => {
             if (err) {
                 return res.status(400).json({ mensaje: "Error al cargar la imagen", error: err.message });
             }
-            const { nombre, descripcion, id_plantilla, fecha } = await req.body;
-            const image = req.file ? `/uploads/empresas/${req.file.filename}` : null;
+            const { nombre, descripcion, id_plantilla, fecha, posicion, color, duracion } = req.body;
 
-            if (!nombre || !descripcion || !fecha) {
-                return res.status(400).json({ mensaje: "Los campos nombre, descripcion y fecha son obligatorios" });
+            if (!nombre || !fecha || !id_plantilla) {
+                return res.status(400).json({ mensaje: "Los campos nombre, fecha y plantilla son obligatorios" });
             }
 
-            const [result] = await db.query(
-                "INSERT INTO grupos (nombre, descripcion, id_plantilla, fecha_curso, imagen_url) VALUES (?, ?, ?, ?, ?)",
-                [nombre, descripcion, id_plantilla || null, fecha, image]
-            );
+            // Mapeo de campos a insertar
+            const fieldsToInsert = {
+                nombre,
+                descripcion,
+                id_plantilla,
+                fecha_curso: fecha,
+                posicion,
+                color,
+                duracion,
+                imagen_url: req.file ? `/uploads/empresas/${req.file.filename}` : null
+            };
+
+            const fields = [];
+            const values = [];
+            const placeholders = [];
+
+            // Filtrar campos con valores definidos
+            Object.entries(fieldsToInsert).forEach(([key, value]) => {
+                if (value !== undefined && value !== '') {
+                    fields.push(key);
+                    values.push(value);
+                    placeholders.push('?');
+                }
+            });
+
+            // Construir y ejecutar la consulta
+            const insertQuery = `INSERT INTO grupos (${fields.join(', ')}) VALUES (${placeholders.join(', ')})`;
+            const [result] = await db.query(insertQuery, values);
 
             res.json({ mensaje: "Grupo creado correctamente", id: result.insertId });
         } catch (error) {
@@ -90,23 +114,43 @@ router.post("/", authMiddleware, async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
     uploadImage(req, res, async (err) => {
         try {
-
             if (err) {
                 return res.status(400).json({ mensaje: "Error al cargar la imagen", error: err.message });
             }
 
             const { id } = req.params;
-            const { nombre, descripcion, id_plantilla, fecha } = await req.body;
+            const { nombre, descripcion, id_plantilla, fecha, posicion, color, duracion } = req.body;
 
-            if (!nombre || !descripcion || !fecha) {
-                return res.status(400).json({ mensaje: "Los campos nombre, descripcion y fecha son obligatorios" });
+            if (!nombre || !fecha || !id_plantilla) {
+                return res.status(400).json({ mensaje: "Los campos nombre, fecha y plantilla son obligatorios" });
             }
 
-            // Get current image if exists
+            // Mapeo de campos a actualizar
+            const fieldsToUpdate = {
+                nombre,
+                descripcion,
+                id_plantilla,
+                fecha_curso: fecha,
+                posicion,
+                color,
+                duracion
+            };
+
+            const updateFields = [];
+            const updateValues = [];
+
+            // Filtrar campos con valores definidos
+            Object.entries(fieldsToUpdate).forEach(([key, value]) => {
+                if (value !== undefined && value !== '') {
+                    updateFields.push(`${key} = ?`);
+                    updateValues.push(value);
+                }
+            });
+
+            // Manejar la imagen
             const [currentGroup] = await db.query("SELECT imagen_url FROM grupos WHERE id = ?", [id]);
             let imagen_url = currentGroup[0]?.imagen_url;
 
-            // If new image uploaded, delete old one and update path
             if (req.file) {
                 if (imagen_url) {
                     const oldImagePath = path.join(__dirname, '..', imagen_url);
@@ -115,12 +159,20 @@ router.put("/:id", authMiddleware, async (req, res) => {
                     }
                 }
                 imagen_url = `/uploads/empresas/${req.file.filename}`;
+                updateFields.push('imagen_url = ?');
+                updateValues.push(imagen_url);
             }
 
-            await db.query(
-                "UPDATE grupos SET nombre = ?, descripcion = ?, id_plantilla = ?, fecha_curso = ?, imagen_url = ? WHERE id = ?",
-                [nombre, descripcion, id_plantilla || null, fecha, imagen_url, id]
-            );
+            // Agregar el ID al final de los valores
+            updateValues.push(id);
+
+            // Construir y ejecutar la consulta
+            const updateQuery = `UPDATE grupos SET ${updateFields.join(', ')} WHERE id = ?`;
+            await db.query(updateQuery, updateValues);
+
+            await eliminarPDFsDeGrupo(id);
+            //pdfs a 0
+            await db.query("UPDATE grupos SET pdfs =? WHERE id =?", [0, id]);
 
             res.json({ mensaje: "Grupo actualizado correctamente" });
         } catch (error) {
@@ -141,6 +193,10 @@ router.delete("/:id", authMiddleware, async (req, res) => {
         }
 
         await db.query("UPDATE grupos SET activo = 0 WHERE id = ?", [id]);
+
+        await eliminarPDFsDeGrupo(id);
+        //pdfs a 0
+        await db.query("UPDATE grupos SET pdfs =? WHERE id =?", [0, id]);
 
         res.json({ mensaje: "Grupo eliminado correctamente" });
     } catch (error) {

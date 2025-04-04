@@ -36,22 +36,17 @@ const ModalGrupo = (grupo, fetchGrupos) => {
                 <label class="text-sm font-medium text-gray-700">Descripción:</label>
                 <textarea id="descripcion" class="border border-gray-300 rounded-md p-2 w-full" placeholder="Descripción">${grupo ? grupo.descripcion : ""}</textarea>
 
-                <label class="text-sm font-medium text-gray-700">Fecha del curso</label>
-                <input id="fecha" class="border border-gray-300 rounded-md p-2 w-full" type="date" value="${fecha_curso}">
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-sm font-medium text-gray-700">Duración:</label>
+                        <input id="duracion" type="number" class="border border-gray-300 rounded-md p-2 w-full" placeholder="Duración" value="${grupo? grupo.duracion : ""}">
+                    </div>
 
-                <label class="text-sm font-medium text-gray-700">Imagen:</label>
-                <input id="imagen" type="file" accept="image/*" class="border border-gray-300 rounded-md p-2 w-full"
-                    onchange="const file = this.files[0];
-                             const reader = new FileReader();
-                             reader.onload = function(e) {
-                                 document.getElementById('preview').src = e.target.result;
-                                 document.getElementById('preview').style.display = 'block';
-                             };
-                             if(file) reader.readAsDataURL(file);">
-                <img id="preview" 
-                     src="${grupo && grupo.imagen_url ? import.meta.env.VITE_BACKEND_URL + grupo.imagen_url : ''}"
-                     class="mt-2 max-h-40 object-contain mx-auto"
-                     style="display: ${grupo && grupo.imagen_url ? 'block' : 'none'}">
+                    <div class="flex-1">
+                        <label class="text-sm font-medium text-gray-700">Fecha de Emisión:</label>
+                        <input id="fecha" class="border border-gray-300 rounded-md p-2 w-full" type="date" value="${fecha_curso}">
+                    </div>
+                </div>
                 
                 <label class="text-sm font-medium text-gray-700">Plantilla:</label>
                 <select id="plantilla" class="border border-gray-300 rounded-md p-2 w-full">
@@ -61,6 +56,35 @@ const ModalGrupo = (grupo, fetchGrupos) => {
                             ${plantilla.nombre}
                         </option>`).join("")}
                 </select>
+
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-sm font-medium text-gray-700">Posición:</label>
+                        <select id="posicion" class="border border-gray-300 rounded-md p-2 w-full h-[42px]">
+                            <option value="1" ${grupo && grupo.posicion === 1? "selected" : ""}>Horizontal</option>
+                            <option value="2" ${grupo && grupo.posicion === 2? "selected" : ""}>Vertical</option>
+                        </select>
+                    </div>
+                
+                    <div class="flex-1">
+                        <label class="text-sm font-medium text-gray-700">Color de QR:</label>
+                        <input id="color" class="border border-gray-300 rounded-md p-2 w-full h-[42px]" type="color" value="${grupo ? grupo.color : '#004987'}">
+                    </div>
+                </div>
+
+                <label class="text-sm font-medium text-gray-700">Logo de Convenio:</label>
+                <input id="imagen" type="file" accept="image/*" class="border border-gray-300 rounded-md p-2 w-full"
+                    onchange="const file = this.files[0];
+                             const reader = new FileReader();
+                             reader.onload = function(e) {
+                                 document.getElementById('preview').src = e.target.result;
+                                 document.getElementById('preview').style.display = 'block';
+                             };
+                             if(file) reader.readAsDataURL(file);">
+                <img id="preview" 
+                     src="${grupo && grupo.imagen_url ? getBackendURL(grupo.imagen_url) : ''}"
+                     class="mt-2 max-h-40 object-contain mx-auto"
+                     style="display: ${grupo && grupo.imagen_url ? 'block' : 'none'}">
             </div>
             `,
             showCancelButton: true,
@@ -70,14 +94,17 @@ const ModalGrupo = (grupo, fetchGrupos) => {
                 const descripcion = document.getElementById("descripcion").value;
                 const id_plantilla = document.getElementById("plantilla").value || null;
                 const fecha = document.getElementById("fecha").value;
+                const duracion = document.getElementById("duracion").value;
                 const imagen = document.getElementById("imagen").files[0];
-                return { nombre, descripcion, id_plantilla, fecha, imagen };
+                const posicion = document.getElementById("posicion").value;
+                const color = document.getElementById("color").value;
+                return { nombre, descripcion, id_plantilla, fecha, imagen, posicion, color, duracion };
             },
         }).then(async (result) => {
             if (result.isConfirmed) {
-                const { nombre, descripcion, id_plantilla, fecha, imagen } = result.value;
-                if (!nombre || !fecha) {
-                    Swal.fire("Error", "El nombre y la fecha son obligatorios", "error");
+                const { nombre, descripcion, id_plantilla, fecha, imagen, posicion, color, duracion } = result.value;
+                if (!nombre || !fecha || !id_plantilla) {
+                    Swal.fire("Error", "El nombre, la fecha y la plantilla son obligatorios", "error");
                     return;
                 }
 
@@ -85,6 +112,9 @@ const ModalGrupo = (grupo, fetchGrupos) => {
                 formData.append("nombre", nombre);
                 formData.append("descripcion", descripcion);
                 formData.append("fecha", fecha);
+                formData.append("posicion", posicion);
+                formData.append("color", color);
+                formData.append("duracion", duracion);
                 if (id_plantilla) formData.append("id_plantilla", id_plantilla);
                 if (imagen) formData.append("imagen", imagen);
 

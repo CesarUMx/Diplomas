@@ -10,6 +10,7 @@ const QRCode = require("qrcode");
  * @param {String} archivoSVG - Nombre del archivo SVG de la plantilla (ej. "plantilla1.svg").
  * @returns {String|null} El SVG personalizado como string, o null si hubo error.
  */
+
 async function generarSVGPersonalizado(alumno, grupo, archivoSVG) {
   try {
     const ruta = path.resolve(__dirname, "../../uploads/plantillas", archivoSVG);
@@ -22,6 +23,18 @@ async function generarSVGPersonalizado(alumno, grupo, archivoSVG) {
 
     // Reemplazar nombre del grupo/curso
     $("#titulo").text(grupo.nombre);
+
+    // Reemplazar duración si existe el elemento
+    const duracionElement = $("#duracion");
+    if (duracionElement.length && grupo.duracion) {
+        duracionElement.text(`con duración de ${grupo.duracion} horas`);
+    }
+
+    // Reemplazar fecha
+    const fecha = new Date(grupo.fecha_curso);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const fechaFormateada = `El Marqués, Querétaro, ${fecha.getDate()} ${fecha.toLocaleDateString('es-MX', options).split(' ').slice(1).join(' ')}`;
+    $("#fecha").text(fechaFormateada);
 
     // Buscar <rect id="qr"> para extraer su posición
     const rectQR = $("#qr");
@@ -41,7 +54,7 @@ async function generarSVGPersonalizado(alumno, grupo, archivoSVG) {
       const qrOptions = {
         width: parseInt(width),
         color: {
-          dark: '#004987',
+          dark: grupo.color || '#004987',  // Use group color or default
           light: '#ffffff'
         },
         errorCorrectionLevel: 'Q',

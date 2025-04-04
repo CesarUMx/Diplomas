@@ -5,6 +5,7 @@ async function convertirSVGaPDF(svgString) {
   const page = await browser.newPage();
 
   await page.setContent(svgString, { waitUntil: "networkidle0" });
+  await page.evaluateHandle('document.fonts.ready');
 
   // Obtener tamaño real del SVG
   const elementHandle = await page.$("svg");
